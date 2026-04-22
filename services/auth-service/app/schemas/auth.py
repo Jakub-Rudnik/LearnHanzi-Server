@@ -34,6 +34,19 @@ class UserRead(BaseModel):
     last_login_at: datetime | None
 
 
+class TokenClaimsRead(BaseModel):
+    sub: UUID
+    email: EmailStr
+    username: str
+    role: UserRole
+    iss: str
+    aud: str
+    iat: int
+    exp: int
+    jti: str
+    typ: str
+
+
 class TokenPairResponse(BaseModel):
     access_token: str
     refresh_token: str
@@ -43,3 +56,8 @@ class TokenPairResponse(BaseModel):
 class AuthResponse(BaseModel):
     user: UserRead
     tokens: TokenPairResponse
+
+
+class SessionRead(BaseModel):
+    user: UserRead
+    token: TokenClaimsRead

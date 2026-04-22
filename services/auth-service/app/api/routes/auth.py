@@ -1,10 +1,16 @@
 from fastapi import APIRouter, Depends, Request, Response, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_active_user, get_db
+from app.api.deps import (
+    get_current_active_user,
+    get_current_token_payload,
+    get_db,
+)
 from app.schemas.auth import (
     AuthResponse,
     RefreshTokenRequest,
+    SessionRead,
+    TokenClaimsRead,
     TokenPairResponse,
     UserCreate,
     UserLogin,
@@ -117,7 +123,16 @@ def logout(
 
 
 @router.get("/me", response_model=UserRead)
-def me(
-    current_user=Depends(get_current_active_user),
-) -> UserRead:
+def me(current_user=Depends(get_current_active_user)) -> UserRead:
     return current_user
+
+
+@router.get("/session", response_model=SessionRead)
+def session(
+    current_user=Depends(get_current_active_user),
+    token_payload: dict = Depends(get_current_token_payload),
+) -> SessionRead:
+    return SessionRead(
+        user=current_user,
+        token=TokenClaimsRead.model_validate(token_payload),
+    )

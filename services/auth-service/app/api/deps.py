@@ -1,4 +1,3 @@
-from functools import lru_cache
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
@@ -23,10 +22,9 @@ def get_db():
         db.close()
 
 
-def get_current_user(
+def get_current_token_payload(
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
-    db: Session = Depends(get_db),
-) -> User:
+) -> dict:
     if credentials is None or credentials.scheme.lower() != "bearer":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -40,10 +38,23 @@ def get_current_user(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token type",
             )
-
-        user_id_raw = payload.get("sub")
-        user_id = UUID(str(user_id_raw))
+        return payload
     except (JWTError, ValueError, TypeError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        ) from None
+
+
+def get_current_user(
+    payload: dict = Depends(get_current_token_payload),
+    db: Session = Depends(get_db),
+) -> User:
+    user_id_raw = payload.get("sub")
+
+    try:
+        user_id = UUID(str(user_id_raw))
+    except (ValueError, TypeError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
