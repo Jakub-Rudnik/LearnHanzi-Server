@@ -1,5 +1,6 @@
 import hashlib
 import secrets
+import uuid
 from datetime import datetime, timedelta, timezone
 
 from jose import jwt
@@ -9,7 +10,8 @@ from app.models.user import User
 
 
 def create_access_token(user: User) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(
+    now = datetime.now(timezone.utc)
+    expire = now + timedelta(
         minutes=settings.access_token_expire_minutes,
     )
 
@@ -18,7 +20,11 @@ def create_access_token(user: User) -> str:
         "email": user.email,
         "username": user.username,
         "role": user.role.value,
+        "iss": settings.jwt_issuer,
+        "iat": int(now.timestamp()),
         "exp": int(expire.timestamp()),
+        "jti": uuid.uuid4().hex,
+        "typ": "access",
     }
 
     return jwt.encode(
@@ -33,6 +39,7 @@ def decode_access_token(token: str) -> dict:
         token,
         settings.jwt_secret_key,
         algorithms=[settings.jwt_algorithm],
+        issuer=settings.jwt_issuer,
     )
 
 
