@@ -21,6 +21,7 @@ def create_access_token(user: User) -> str:
         "username": user.username,
         "role": user.role.value,
         "iss": settings.jwt_issuer,
+        "aud": settings.jwt_audience,
         "iat": int(now.timestamp()),
         "exp": int(expire.timestamp()),
         "jti": uuid.uuid4().hex,
@@ -40,6 +41,7 @@ def decode_access_token(token: str) -> dict:
         settings.jwt_secret_key,
         algorithms=[settings.jwt_algorithm],
         issuer=settings.jwt_issuer,
+        audience=settings.jwt_audience,
     )
 
 
