@@ -3,7 +3,11 @@ from datetime import datetime, timezone
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.security import hash_password, verify_password
+from app.core.security import (
+    hash_password,
+    validate_password_strength,
+    verify_password,
+)
 from app.models.user import User, UserRole
 from app.repositories.users import (
     get_user_by_email,
@@ -36,6 +40,14 @@ def register_user(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already taken",
         )
+
+    try:
+        validate_password_strength(password)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
 
     user = User(
         username=normalized_username,
