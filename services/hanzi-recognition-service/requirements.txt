@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+pydantic-settings
+Pillow
+numpy
+torch
+torchvision
+timm
