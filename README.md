@@ -10,7 +10,7 @@ Monorepo backendu projektu LearnHanzi.
 ### Obsługa dużych plików (git lfs) 
 Z powodu, że plik modelu przekracza rozmiar plików obsługiwanych przez GitHub, został on dodany przy użyciu git large file system.  
 Aby poprawnie pobrać repozytorium wraz z modelem, należy zainstalować Git LFS:  
-```git lfs install```
+```git lfs install```  
 Klonowanie repozytorium:  
 ```git clone https://github.com/Jakub-Rudnik/LearnHanzi-Server.git```  
 Po sklonowaniu repozytorium należy pobrać pliki zarządzane przez Git LFS:  
