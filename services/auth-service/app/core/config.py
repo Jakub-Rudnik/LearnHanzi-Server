@@ -1,7 +1,9 @@
+from dotenv import load_dotenv
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+load_dotenv()
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
@@ -13,6 +15,7 @@ class Settings(BaseSettings):
     jwt_audience: str = "learnhanzi-services"
     access_token_expire_minutes: int = 15
     refresh_token_expire_days: int = 7
+    frontend_url: str
 
 
 @lru_cache
