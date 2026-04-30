@@ -22,6 +22,8 @@ class HanziModel:
         self.labels = {int(k): v for k, v in self.labels.items()}
         num_classes = len(self.labels)
 
+        self.char_to_id = {v: k for k, v in self.labels.items()}
+
         self.transform = transforms.Compose([
             transforms.Resize((224, 224)),
             transforms.Grayscale(num_output_channels=3),
@@ -77,3 +79,37 @@ class HanziModel:
             })
 
         return results
+    
+    def score_character(self, image_base64: str, character: str, topk=5):
+        if character not in self.char_to_id:
+            raise ValueError(f"Unknown character: {character}")
+
+        x = self.preprocess(image_base64)
+
+        with torch.no_grad():
+            outputs = self.model(x)
+            probs = torch.softmax(outputs, dim=1)
+
+        # confidence dla konkretnego znaku
+        char_id = self.char_to_id[character]
+        confidence = probs[0, char_id].item()
+
+        # top-k (reuse logiki)
+        top_probs, top_indices = probs.topk(topk, dim=1)
+
+        top_probs = top_probs[0].cpu().numpy()
+        top_indices = top_indices[0].cpu().numpy()
+
+        top_results = []
+        for i in range(topk):
+            label_id = int(top_indices[i])
+            top_results.append({
+                "character": self.labels[label_id],
+                "confidence": float(top_probs[i])
+            })
+
+        return {
+            "character": character,
+            "confidence": confidence,
+            "top_predictions": top_results
+        }

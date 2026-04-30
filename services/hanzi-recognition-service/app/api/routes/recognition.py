@@ -8,11 +8,20 @@ router = APIRouter(tags=["recognition"])
 async def recognize_hanzi(request_data: RecognitionRequest, request: Request):
 
     model = request.app.state.model
-
-    predictions = model.predict(request_data.image_base64, topk=5)
+    
+    if request_data.character is None:
+        # standardowa predykcja topk
+        predictions = model.predict(request_data.image_base64, topk=5)
+        return RecognitionResponse(
+            character=predictions[0]["character"],
+            confidence=predictions[0]["confidence"],
+            top_predictions=predictions
+        )
+    
+    score = model.score_character(request_data.image_base64, request_data.character, topk=5)
 
     return RecognitionResponse(
-        character=predictions[0]["character"],
-        confidence=predictions[0]["confidence"],
-        top_predictions=predictions
+        character=score["character"],
+        confidence=score["confidence"],
+        top_predictions=score["top_predictions"]
     )

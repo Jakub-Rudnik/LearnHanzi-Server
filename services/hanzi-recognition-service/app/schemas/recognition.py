@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 class RecognitionRequest(BaseModel):
     image_base64: str
+    character: str | None = None
 
 
 class PredictionItem(BaseModel):
