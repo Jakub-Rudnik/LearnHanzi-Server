@@ -3,18 +3,19 @@ services:
     image: postgres:16-alpine
     container_name: learnhanzi_auth_db
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: postgres
     ports:
-      - "5432:5432"
-    volumes:
+      - "${DB_PORT}:5432" 
+    volumes: 
       - auth_pgdata:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}",
+          "pg_isready -U ${DB_USER}",
         ]
       interval: 5s
       timeout: 5s
@@ -26,6 +27,7 @@ services:
     container_name: learnhanzi_auth_api
     env_file:
       - .env
+      - ../services/auth-service/.env
     ports:
       - "8000:8000"
     volumes:
@@ -48,6 +50,24 @@ services:
     env_file:
       - ../services/hanzi-recognition-service/.env
     command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+
+  dictionary:
+    build:
+      context: ../services/dictionary-service
+    container_name: learnhanzi_dictionary_api
+    env_file:
+      - .env
+      - ../services/dictionary-service/.env
+    ports:
+      - "8002:8002"
+    volumes:
+      - ../services/dictionary-service:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8002 --reload"
 
 volumes:
   auth_pgdata:
