@@ -12,10 +12,11 @@ Z powodu, że plik modelu przekracza rozmiar plików obsługiwanych przez GitHub
 ```services/hanzi-recognition-service/app/models/hanzi_model.pt```  
 
 ## Utworzenie plików .env
-```cp infra/.env.example infra/.env```
-```cp services/auth-service/.env.example services/auth-service/.env```
-```cp services/dictionary-service/.env.example services/dictionary-service/.env```
-```cp services/hanzi-recognition-service/.env.example services/hanzi-recognition-service/.env```
+```cp infra/.env.example infra/.env```/
+```cp services/auth-service/.env.example services/auth-service/.env```/
+```cp services/dictionary-service/.env.example services/dictionary-service/.env```/
+```cp services/hanzi-recognition-service/.env.example services/hanzi-recognition-service/.env```/
+```cp services/progress-service/.env.example services/progress-service/.env```/
 
 ## Wypełnienie tabeli hanzi
 Po uruchomieniu kontenera należy wykonać
