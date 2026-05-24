@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
@@ -21,18 +23,18 @@ router = APIRouter(
 
 @router.get("/", response_model=list[HanziResponse])
 def get_all_hanzi(
-    limit: int = 100,
-    offset: int = 0,
+    limit: int = Query(100, ge=1, le=500),
+    offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
 ):
     return list_hanzi(db, limit=limit, offset=offset)
 
-@router.get("/{hanzi_id}", response_model=HanziResponse)
-def get_hanzi_by_id_endpoint(
-    hanzi_id: int,
+@router.get("/character/{character}", response_model=HanziResponse)
+def get_hanzi_by_character_endpoint(
+    character: str,
     db: Session = Depends(get_db),
 ):
-    hanzi = get_by_id(db, hanzi_id)
+    hanzi = get_by_character(db, character)
 
     if not hanzi:
         raise HTTPException(
@@ -42,12 +44,12 @@ def get_hanzi_by_id_endpoint(
 
     return hanzi
 
-@router.get("/character/{character}", response_model=HanziResponse)
-def get_hanzi_by_character_endpoint(
-    character: str,
+@router.get("/{hanzi_id}", response_model=HanziResponse)
+def get_hanzi_by_id_endpoint(
+    hanzi_id: UUID,
     db: Session = Depends(get_db),
 ):
-    hanzi = get_by_character(db, character)
+    hanzi = get_by_id(db, hanzi_id)
 
     if not hanzi:
         raise HTTPException(
