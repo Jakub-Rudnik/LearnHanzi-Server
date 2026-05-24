@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from pydantic import BaseModel, Field
 from typing import Optional, List
 
@@ -10,7 +12,7 @@ class HanziCreate(BaseModel):
     theme_category: Optional[str] = None
 
 class HanziResponse(BaseModel):
-    id: int
+    id: UUID
     character: str
     pinyin: str
     meaning_pl: str
