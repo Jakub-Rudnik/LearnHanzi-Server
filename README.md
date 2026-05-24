@@ -10,8 +10,16 @@ Monorepo backendu projektu LearnHanzi.
 ### Dodanie pliku zawierającego wytrenowany model
 Z powodu, że plik modelu przekracza rozmiar plików obsługiwanych przez GitHub, należy pobrać go z [google drive](https://drive.google.com/file/d/1DpOwfYCmrTQJMlubpwBvHoWpgwmB4aH8/view?usp=sharing) i umieścić w odpowiednim folderze:  
 ```services/hanzi-recognition-service/app/models/hanzi_model.pt```  
-### Wirtualne środowisko  
-Mikroserwis identyfikujący hanzi posiada odrębnego `.env`. W `ervices/hanzi-recognition-service` znajduje się `.env.example`, który należy skopiować.  
+
+## Utworzenie plików .env
+```cp infra/.env.example infra/.env```
+```cp services/auth-service/.env.example services/auth-service/.env```
+```cp services/dictionary-service/.env.example services/dictionary-service/.env```
+```cp services/hanzi-recognition-service/.env.example services/hanzi-recognition-service/.env```
+
+## Wypełnienie tabeli hanzi
+Po uruchomieniu kontenera należy wykonać
+```docker compose exec dictionary-service python -m scripts.seed_hanzi```
 
 ## Założenia
 - FastAPI
