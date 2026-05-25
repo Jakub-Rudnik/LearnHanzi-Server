@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.jwt import decode_access_token
 from app.db.session import SessionLocal
-from app.models.user import User, UserRole
+from app.models.user import AccountStatus, User, UserRole
 from app.repositories.users import get_user_by_id
 
 
@@ -73,10 +73,10 @@ def get_current_user(
 def get_current_active_user(
     current_user: User = Depends(get_current_user),
 ) -> User:
-    if not current_user.is_active:
+    if current_user.account_status != AccountStatus.ACTIVE:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Account is inactive",
+            detail=f"Account is {current_user.account_status.value.lower()}",
         )
     return current_user
 

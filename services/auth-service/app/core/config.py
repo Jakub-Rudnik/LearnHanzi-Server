@@ -20,8 +20,18 @@ class Settings(BaseSettings):
     jwt_audience: str = "learnhanzi-services"
     access_token_expire_minutes: int = 15
     refresh_token_expire_days: int = 7
+    password_reset_token_expire_minutes: int = 30
+    password_reset_debug_return_token: bool = True
 
     frontend_url: str
+    frontend_reset_password_path: str = "/reset-password"
+
+    smtp_host: str | None = None
+    smtp_port: int = 1025
+    smtp_user: str | None = None
+    smtp_password: str | None = None
+    smtp_from_email: str | None = None
+    smtp_starttls: bool = False
 
     @property
     def database_url(self) -> str:

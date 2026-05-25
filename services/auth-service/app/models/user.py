@@ -2,7 +2,7 @@ import enum
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, String, Boolean, func
+from sqlalchemy import DateTime, Enum, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -12,6 +12,12 @@ from app.db.base import Base
 class UserRole(str, enum.Enum):
     USER = "USER"
     ADMIN = "ADMIN"
+
+
+class AccountStatus(str, enum.Enum):
+    ACTIVE = "ACTIVE"
+    BANNED = "BANNED"
+    SUSPENDED = "SUSPENDED"
 
 
 class User(Base):
@@ -41,10 +47,10 @@ class User(Base):
         nullable=False,
         default=UserRole.USER,
     )
-    is_active: Mapped[bool] = mapped_column(
-        Boolean,
+    account_status: Mapped[AccountStatus] = mapped_column(
+        Enum(AccountStatus, name="account_status"),
         nullable=False,
-        default=True,
+        default=AccountStatus.ACTIVE,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

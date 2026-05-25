@@ -10,7 +10,7 @@ from app.core.jwt import (
     hash_refresh_token,
 )
 from app.models.refresh_token_session import RefreshTokenSession
-from app.models.user import User
+from app.models.user import AccountStatus, User
 from app.repositories.refresh_tokens import get_refresh_session_by_hash
 from app.repositories.users import get_user_by_id
 
@@ -63,7 +63,7 @@ def rotate_refresh_token(
         )
 
     user = get_user_by_id(db, session.user_id)
-    if user is None or not user.is_active:
+    if user is None or user.account_status != AccountStatus.ACTIVE:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid refresh token",

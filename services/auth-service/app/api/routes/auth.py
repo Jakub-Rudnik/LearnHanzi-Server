@@ -6,8 +6,13 @@ from app.api.deps import (
     get_current_token_payload,
     get_db,
 )
+from app.models.user import User
 from app.schemas.auth import (
     AuthResponse,
+    PasswordChange,
+    PasswordResetConfirm,
+    PasswordResetRequest,
+    PasswordResetRequestResponse,
     RefreshTokenRequest,
     SessionRead,
     TokenClaimsRead,
@@ -16,7 +21,13 @@ from app.schemas.auth import (
     UserLogin,
     UserRead,
 )
-from app.services.auth_service import authenticate_user, register_user
+from app.services.auth_service import (
+    authenticate_user,
+    change_password,
+    confirm_password_reset,
+    register_user,
+    request_password_reset,
+)
 from app.services.session_service import (
     issue_token_pair,
     revoke_refresh_token,
@@ -118,6 +129,54 @@ def logout(
     revoke_refresh_token(
         db=db,
         raw_refresh_token=payload.refresh_token,
+    )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/password-reset/request", response_model=PasswordResetRequestResponse)
+def password_reset_request(
+    payload: PasswordResetRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> PasswordResetRequestResponse:
+    reset_token = request_password_reset(
+        db=db,
+        email=payload.email,
+        requested_ip=request.client.host if request.client else None,
+    )
+
+    return PasswordResetRequestResponse(
+        detail=(
+            "If an account with this email exists, reset instructions were sent"
+        ),
+        reset_token=reset_token,
+    )
+
+
+@router.post("/password-reset/confirm", status_code=status.HTTP_204_NO_CONTENT)
+def password_reset_confirm(
+    payload: PasswordResetConfirm,
+    db: Session = Depends(get_db),
+) -> Response:
+    confirm_password_reset(
+        db=db,
+        token=payload.token,
+        new_password=payload.new_password,
+    )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/password", status_code=status.HTTP_204_NO_CONTENT)
+def change_user_password(
+    payload: PasswordChange,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> Response:
+    change_password(
+        db=db,
+        user=current_user,
+        current_password=payload.current_password,
+        new_password=payload.new_password,
     )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
