@@ -5,10 +5,26 @@ from app.repositories.user_progress import (
     get_ranking,
 )
 from app.clients.dictionary_client import get_hanzi
+from app.core.config import settings
+import requests
 
 
 def calculate_points(accuracy_score: float, difficulty_level: int) -> int:
     return int(accuracy_score * difficulty_level)
+
+
+def _sync_difficulty_to_flashcard_service(user_id, hanzi_id, accuracy_score: float, is_correct: bool):
+    """Notify flashcard-service to auto-mark character as difficult if needed."""
+    try:
+        url = f"{settings.flashcard_service_url.rstrip('/')}/flashcards/internal/sync-difficulty/{user_id}/{hanzi_id}"
+        requests.post(
+            url,
+            params={"accuracy_score": accuracy_score, "is_correct": is_correct},
+            timeout=5,
+        )
+    except Exception as e:
+        # Don't fail the progress recording if flashcard sync fails
+        print(f"Warning: Failed to sync difficulty to flashcard service: {e}")
 
 
 def record_progress(db, event):
@@ -26,7 +42,17 @@ def record_progress(db, event):
         attempt_date=event.attempt_date,
     )
 
-    return create_progress(db, progress)
+    result = create_progress(db, progress)
+    
+    # Async-ish: notify flashcard service to update difficulty state
+    _sync_difficulty_to_flashcard_service(
+        event.user_id,
+        event.hanzi_id,
+        event.accuracy_score,
+        event.is_correct,
+    )
+
+    return result
 
 
 def last_attempt(db, user_id, hanzi_id):
