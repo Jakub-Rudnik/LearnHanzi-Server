@@ -17,6 +17,7 @@ Z powodu, że plik modelu przekracza rozmiar plików obsługiwanych przez GitHub
 ```cp services/dictionary-service/.env.example services/dictionary-service/.env```\
 ```cp services/hanzi-recognition-service/.env.example services/hanzi-recognition-service/.env```\
 ```cp services/progress-service/.env.example services/progress-service/.env```
+```cp services/flashcard-service/.env.example services/flashcard-service/.env```
 
 ## Wypełnienie tabeli hanzi
 Po uruchomieniu kontenera należy wykonać
