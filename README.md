@@ -16,11 +16,11 @@ Z powodu, że plik modelu przekracza rozmiar plików obsługiwanych przez GitHub
 ```cp services/auth-service/.env.example services/auth-service/.env```\
 ```cp services/dictionary-service/.env.example services/dictionary-service/.env```\
 ```cp services/hanzi-recognition-service/.env.example services/hanzi-recognition-service/.env```\
-```cp services/progress-service/.env.example services/progress-service/.env```\
+```cp services/progress-service/.env.example services/progress-service/.env```
 
 ## Wypełnienie tabeli hanzi
 Po uruchomieniu kontenera należy wykonać
-```docker compose exec dictionary-service python -m scripts.seed_hanzi```
+```docker compose exec dictionary python -m scripts.seed_hanzi```
 
 ## Założenia
 - FastAPI
