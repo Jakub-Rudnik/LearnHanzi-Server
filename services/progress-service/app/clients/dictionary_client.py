@@ -1,4 +1,3 @@
-# app/clients/dictionary_client.py
 import requests
 from app.core.config import settings
 

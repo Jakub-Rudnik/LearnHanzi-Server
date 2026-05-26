@@ -9,8 +9,8 @@ from app.core.config import settings
 import requests
 
 
-def calculate_points(accuracy_score: float, difficulty_level: int) -> int:
-    return int(accuracy_score * difficulty_level)
+def calculate_points(accuracy_score: float) -> int:
+    return int(accuracy_score * 100)
 
 
 def _sync_difficulty_to_flashcard_service(user_id, hanzi_id, accuracy_score: float, is_correct: bool):
@@ -28,10 +28,7 @@ def _sync_difficulty_to_flashcard_service(user_id, hanzi_id, accuracy_score: flo
 
 
 def record_progress(db, event):
-    hanzi = get_hanzi(event.hanzi_id)
-    difficulty = hanzi["difficulty_level"]
-
-    points = calculate_points(event.accuracy_score, difficulty)
+    points = calculate_points(event.accuracy_score)
 
     progress = UserProgress(
         user_id=event.user_id,
@@ -43,8 +40,7 @@ def record_progress(db, event):
     )
 
     result = create_progress(db, progress)
-    
-    # Async-ish: notify flashcard service to update difficulty state
+
     _sync_difficulty_to_flashcard_service(
         event.user_id,
         event.hanzi_id,
@@ -61,4 +57,3 @@ def last_attempt(db, user_id, hanzi_id):
 
 def ranking(db, limit: int = 100):
     return get_ranking(db, limit)
-
