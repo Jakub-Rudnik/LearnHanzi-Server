@@ -3,8 +3,8 @@ from app.repositories.user_progress import (
     create_progress,
     get_last_attempt,
     get_ranking,
+    get_user_hanzi_progress,
 )
-from app.clients.dictionary_client import get_hanzi
 from app.core.config import settings
 import requests
 
@@ -57,3 +57,17 @@ def last_attempt(db, user_id, hanzi_id):
 
 def ranking(db, limit: int = 100):
     return get_ranking(db, limit)
+
+
+def user_hanzi_progress(db, user_id):
+    progress_entries = get_user_hanzi_progress(db, user_id)
+
+    return [
+        {
+            "hanzi_id": entry.hanzi_id,
+            "last_accuracy_score": entry.accuracy_score,
+            "last_is_correct": entry.is_correct,
+            "last_attempt_date": entry.attempt_date,
+        }
+        for entry in progress_entries
+    ]

@@ -31,3 +31,13 @@ class ProgressResponse(BaseModel):
 class RankingItem(BaseModel):
     user_id: UUID
     total_points: int
+
+class UserHanziProgress(BaseModel):
+    hanzi_id: UUID
+
+    last_accuracy_score: float
+    last_is_correct: bool
+    last_attempt_date: datetime
+
+    class Config:
+        from_attributes = True
